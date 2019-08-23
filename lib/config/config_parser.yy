@@ -1111,6 +1111,14 @@ use_specifier_item: identifier
 		$$ = new std::pair<String, std::unique_ptr<Expression> >(*$1, std::unique_ptr<Expression>($3));
 		delete $1;
 	}
+	| T_THIS
+	{
+		$$ = new std::pair<String, std::unique_ptr<Expression> >("this", std::unique_ptr<Expression>(new GetScopeExpression(ScopeThis)));
+	}
+	| T_THIS T_SET rterm
+	{
+		$$ = new std::pair<String, std::unique_ptr<Expression> >("this", std::unique_ptr<Expression>($3));
+	}
 	;
 
 apply_for_specifier: /* empty */
