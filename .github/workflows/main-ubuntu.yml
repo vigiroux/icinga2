@@ -34,6 +34,7 @@ jobs:
         -DCMAKE_INSTALL_RPATH=/usr/lib/${arch}-linux-gnu/icinga-boost
     - name: Build
       run: |
-         make
-         make test
-         make install
+        cd debug
+        make
+        make test
+        make install
