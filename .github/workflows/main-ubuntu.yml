@@ -11,17 +11,17 @@ jobs:
     - uses: actions/checkout@v1
     - name: Dependencies
       run: |
-        apt-get -y install apt-transport-https wget gnupg
-        wget -O - https://packages.icinga.com/icinga.key | apt-key add -
+        sudo apt-get -y install apt-transport-https wget gnupg
+        sudo wget -O - https://packages.icinga.com/icinga.key | apt-key add -
         . /etc/os-release; if [ ! -z ${UBUNTU_CODENAME+x} ]; then DIST="${UBUNTU_CODENAME}"; else DIST="$(lsb_release -c| awk '{print $2}')"; fi; \
-        echo "deb https://packages.icinga.com/ubuntu icinga-${DIST} main" > \
+        sudo echo "deb https://packages.icinga.com/ubuntu icinga-${DIST} main" > \
         /etc/apt/sources.list.d/${DIST}-icinga.list
-        echo "deb-src https://packages.icinga.com/ubuntu icinga-${DIST} main" >> \
+        sudo echo "deb-src https://packages.icinga.com/ubuntu icinga-${DIST} main" >> \
         /etc/apt/sources.list.d/${DIST}-icinga.list
-        apt-get update
-        apt-get -y install gdb vim git cmake make ccache build-essential libssl-dev bison flex default-libmysqlclient-dev libpq-dev libedit-dev libboost1.67-icinga-all-dev
-        ln -s /usr/bin/ccache /usr/local/bin/gcc
-        ln -s /usr/bin/ccache /usr/local/bin/g++
+        sudo apt-get update
+        sudo apt-get -y install gdb vim git cmake make ccache build-essential libssl-dev bison flex default-libmysqlclient-dev libpq-dev libedit-dev libboost1.67-icinga-all-dev
+        sudo ln -s /usr/bin/ccache /usr/local/bin/gcc
+        sudo ln -s /usr/bin/ccache /usr/local/bin/g++
     - name: Before Script
       run: |
         arch=$(uname -m)
