@@ -13,7 +13,7 @@ jobs:
       run: |
         sudo apt-get -y install apt-transport-https wget gnupg
         sudo wget -O - https://packages.icinga.com/icinga.key | sudo apt-key add -
-        sudo echo "deb https://packages.icinga.com/ubuntu icinga-ubuntu-bionic main" > /etc/apt/sources.list.d/ubuntu-bionic-icinga.list
+        sudo echo "deb https://packages.icinga.com/ubuntu icinga-ubuntu-bionic main" | sudo tee -a /etc/apt/sources.list.d/ubuntu-bionic-icinga.list
         sudo apt-get update
         sudo apt-get -y install gdb vim git cmake make ccache build-essential libssl-dev bison flex default-libmysqlclient-dev libpq-dev libedit-dev libboost1.67-icinga-all-dev
         sudo ln -s /usr/bin/ccache /usr/local/bin/gcc
