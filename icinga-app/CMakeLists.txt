@@ -12,7 +12,7 @@ set(icingaloader_SOURCES
 )
 
 add_library(icingaloader OBJECT ${icingaloader_SOURCES})
-add_dependencies(icingaloader base config cli)
+add_dependencies(icingaloader base config cli ${GO_APP_DEPS})
 
 set_target_properties (
   icingaloader PROPERTIES
@@ -57,6 +57,8 @@ if(ICINGA2_WITH_ICINGADB)
   list(APPEND icinga_app_SOURCES $<TARGET_OBJECTS:icingadb>)
 endif()
 
+link_directories(${GO_LINK_DIRS})
+
 add_executable(icinga-app
   $<TARGET_OBJECTS:icingaloader>
   ${base_OBJS}
@@ -68,7 +70,7 @@ add_executable(icinga-app
   ${icinga_app_SOURCES}
 )
 
-target_link_libraries(icinga-app ${base_DEPS})
+target_link_libraries(icinga-app ${base_DEPS} ${GO_LINK_LIBS})
 
 set_target_properties (
   icinga-app PROPERTIES
