@@ -198,7 +198,7 @@ DequeueLoop:
 	for {
 		select {
 		case <-readLoopDone:
-			break
+			break DequeueLoop
 		case <-m.writeQueue.feed:
 		}
 
