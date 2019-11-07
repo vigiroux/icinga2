@@ -68,6 +68,7 @@ func invokeCallback(cb callback, es *exitStatus) {
 		C.invokeCallback(
 			C.uintptr_t(cb.function), C.uintptr_t(cb.data), C.uint64_t(es.iPid),
 			C.pid_t(es.pid), C.int(es.exitCode), C.uintptr_t(sh.Data), C.size_t(sh.Len),
+			C.double(timeToFloat(es.execStart)), C.double(timeToFloat(es.execEnd)),
 		)
 	}
 }
@@ -100,4 +101,9 @@ func copyCStrs(cStrs C.uintptr_t) []string {
 	}
 
 	return res
+}
+
+func timeToFloat(t time.Time) float64 {
+	sec := t.Unix()
+	return float64(sec) + float64(t.Sub(time.Unix(sec, 0)))/float64(time.Second)
 }

@@ -53,10 +53,12 @@ var _ = func() struct{} {
 }()
 
 type exitStatus struct {
-	iPid     uint64
-	pid      int
-	exitCode int
-	output   []byte
+	iPid      uint64
+	pid       int
+	exitCode  int
+	output    []byte
+	execStart time.Time
+	execEnd   time.Time
 }
 
 var _ = func() struct{} {
@@ -258,6 +260,8 @@ func (m *manager) handleRequest(req interface{}) {
 		cmd.Stderr = &out
 
 		if errSt := cmd.Start(); errSt == nil {
+			start := time.Now()
+
 			timer := time.NewTimer(req.timeout)
 			defer timer.Stop()
 
@@ -265,18 +269,22 @@ func (m *manager) handleRequest(req interface{}) {
 			go waitForCmd(cmd, waitErr)
 
 			var errWt error
+			var end time.Time
 
 			select {
 			case errWt = <-waitErr:
+				end = time.Now()
 			case <-timer.C:
 				syscall.Kill(-cmd.Process.Pid, syscall.SIGKILL)
+
 				errWt = <-waitErr
+				end = time.Now()
 
 				out.Write([]byte("<Timeout exceeded.>"))
 			}
 
 			if errWt == nil {
-				m.enqueueMessage(&exitStatus{req.iPid, cmd.Process.Pid, 0, out.Bytes()})
+				m.enqueueMessage(&exitStatus{req.iPid, cmd.Process.Pid, 0, out.Bytes(), start, end})
 			} else if ee, ok := errWt.(*exec.ExitError); ok {
 				var exitCode int
 				status := ee.ProcessState.Sys().(syscall.WaitStatus)
@@ -296,12 +304,13 @@ func (m *manager) handleRequest(req interface{}) {
 					out.Write([]byte(ee.Error()))
 				}
 
-				m.enqueueMessage(&exitStatus{req.iPid, cmd.Process.Pid, exitCode, out.Bytes()})
+				m.enqueueMessage(&exitStatus{req.iPid, cmd.Process.Pid, exitCode, out.Bytes(), start, end})
 			} else {
-				m.enqueueMessage(&exitStatus{req.iPid, -1, 128, []byte(errWt.Error())})
+				m.enqueueMessage(&exitStatus{req.iPid, -1, 128, []byte(errWt.Error()), start, end})
 			}
 		} else {
-			m.enqueueMessage(&exitStatus{req.iPid, -1, 128, []byte(errSt.Error())})
+			now := time.Now()
+			m.enqueueMessage(&exitStatus{req.iPid, -1, 128, []byte(errSt.Error()), now, now})
 		}
 	case *exitStatus:
 		invokeCallback(m.popCallback(req.iPid), req)
