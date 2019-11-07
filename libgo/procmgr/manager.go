@@ -258,6 +258,7 @@ func (m *manager) handleRequest(req interface{}) {
 		cmd.Env = append(m.ourEnv.vars, req.extraEnv...)
 		cmd.Stdout = &out
 		cmd.Stderr = &out
+		cmd.SysProcAttr.Setsid = true
 
 		if errSt := cmd.Start(); errSt == nil {
 			start := time.Now()
